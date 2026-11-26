@@ -4,6 +4,7 @@ import { connection } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { ArrowRight, Check } from 'lucide-react';
 import { recordFunnelEvent } from '@/server/funnel-events';
+import { HomepageAuthActions } from '@/components/landing/homepage-auth-actions';
 
 const services = [
   {
@@ -44,18 +45,21 @@ export default function Home({
           <Link href='/' className='text-xl font-bold tracking-tight'>
             GrowMe<span className='text-primary'>Online</span>
           </Link>
-          <div className='flex items-center gap-5'>
+          <div className='flex items-center gap-2'>
             <Link
               href='#how-it-works'
               className='text-muted-foreground hover:text-foreground hidden text-sm font-medium sm:inline'
             >
               How it works
             </Link>
+            <HomepageAuthActions />
             <Link
               href='/request'
-              className='bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors'
+              aria-label='Request a provider'
+              className='bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors sm:px-5'
             >
-              Request a provider
+              <span className='sm:hidden'>Request</span>
+              <span className='hidden sm:inline'>Request a provider</span>
               <ArrowRight aria-hidden='true' className='size-4' />
             </Link>
           </div>
