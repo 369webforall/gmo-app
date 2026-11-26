@@ -1,12 +1,12 @@
-# GrowMeOnline Full-Stack Architect Skill v2.5
+# GrowMeOnline Full-Stack Architect Skill v2.6
 
 > **Status:** Master engineering specification  
-> **Version:** 2.5  
-> **Updated:** 24 November 2026  
+> **Version:** 2.6  
+> **Updated:** 26 November 2026  
 > **Product:** GrowMeOnline (GMO)  
 > **Primary market:** South Africa  
 > **Architecture:** Modular monolith, Next.js App Router, TypeScript, PostgreSQL and Prisma  
-> **Purpose:** Guide all AI-assisted and human development of GrowMeOnline. This version makes a lean, human-operated, MVP-first launch the default delivery strategy, incorporates Kandua and Snupit customer-journey lessons plus Bark marketplace benchmarks, and preserves GMO's approved commercial, technical and operational rules.
+> **Purpose:** Canonical product, architecture and execution specification for AI-assisted and human development of GrowMeOnline. v2.6 adds an end-to-end implementation mandate for supplier registration, client registration, supplier business profiles, admin management, public pages, integration, testing and completion evidence while preserving approved business, technical, privacy and commercial rules.
 
 ---
 
@@ -57,6 +57,23 @@ This release records the GrowMeOnline visual identity observed in the user-provi
 - Green success/check states: use an accessible semantic green; do not treat the WhatsApp floating-action icon's green as a core GMO brand color.
 
 The screenshot shows a clean white layout, dark navy typography, teal headings and primary buttons, blue-grey supporting text, and a lime accent in the logo. Preserve this visual direction. Do not revert to the older generic `#0F172A` / `#0D9488` / `#10B981` palette as the canonical brand palette.
+
+### v2.6 change summary — 26 November 2026
+
+This release changes the development operating model from a feature-planning guide into an end-to-end implementation mandate for the first complete account and supplier-profile experience.
+
+Approved implementation scope:
+- Complete supplier registration, authentication, onboarding, profile editing, submission, admin review, approval, verification and publication.
+- Complete client/customer registration, authentication, profile management and enquiry history, while preserving guest enquiry submission as a low-friction acquisition path.
+- Complete public supplier business pages backed by the canonical PostgreSQL data model, including business details, services, categories, service areas, media, contact actions, SEO metadata, structured data and indexability controls.
+- Complete admin workflows needed to review suppliers, manage profiles, moderate public content, manage categories/locations and resolve profile lifecycle states.
+- Connect all interfaces to real server-side business logic and the existing canonical data model. No fake-only UI, disconnected mock forms or placeholder success states.
+- Require AI coding agents to inspect the repository, plan, implement, run migrations safely, test, fix failures, document and report evidence. Agents must continue through the requested feature's definition of done rather than stopping after advice or a partial scaffold.
+- Resolve earlier MVP wording that deferred supplier/customer self-service: these capabilities are now explicitly in the requested implementation scope. Payments, advanced automation, supplier CRM, dormant-lead reactivation and other nonessential expansion remain separately phased unless explicitly requested.
+- Preserve guest enquiries, human-reviewed lead dispatch, five free qualified assignments, R200/month and R1,200/year subscription choices, no commission and no per-lead fee.
+- Preserve the provisional GMO palette and verify it against actual source assets/styles during the repository/site audit.
+
+This version does not authorize an agent to invent missing legal, pricing, verification, retention or provider policies. It must identify unresolved decisions, use safe defaults where this specification already provides them, and ask only when a decision is genuinely blocking or materially changes business/legal behavior.
 
 ## How to use this skill
 
@@ -281,13 +298,13 @@ The exact adapter construction must follow the installed Prisma 7 documentation.
 
 ## 3.4 Authentication decision
 
-Use **Better Auth** as the selected authentication foundation unless a documented technical blocker is found. Keep the integration in the architecture and codebase plan, but implement account experiences according to launch phase:
+Use **Better Auth** as the selected authentication foundation unless a documented technical blocker is found. Keep the integration in the architecture and codebase plan. The MVP-first account deferral below is historical; Sections 39-42 commit the current client and supplier account scope:
 
 - MVP: secure admin authentication, session management and role-based authorization are mandatory.
 - MVP: customers may submit enquiries without creating an account, subject to validation, contact verification and abuse controls.
-- MVP: supplier onboarding and verification may be operated manually by GMO staff. Do not require a supplier dashboard or full self-service account journey to validate customer demand.
-- Later phase: enable supplier self-service accounts and dashboards when the pilot shows that operational volume justifies them.
-- Later/optional: customer accounts and enquiry history should be added only when there is a demonstrated customer need.
+- Pilot launch: supplier onboarding and verification may still be operated manually by GMO staff; live self-service does not replace the required verification and admin review gates.
+- Current v2.6 build: implement supplier registration/profile management and client accounts/enquiry history as specified in Sections 39-42. Guest enquiries remain supported.
+- Later/optional: advanced CRM and additional account features beyond the committed v2.6 acceptance criteria require separate evidence and approval.
 
 - Use the official Prisma adapter and schema generation instructions.
 - Integrate the Better Auth user identity with the GMO user profile and role model.
@@ -457,7 +474,7 @@ This section specifies the required entities and relationships. Exact field name
 
 ## 6.1 Identity and account entities
 
-The canonical data model may define future customer and supplier accounts even when the MVP does not expose self-service account journeys. Do not build UI, onboarding friction or account dependencies merely because an entity exists in the schema. MVP admin users must authenticate; customer enquiries can be anonymous with appropriate controls; suppliers can initially be managed by GMO operations staff.
+The canonical data model supports the current v2.6 client and supplier account journeys. Guest enquiries remain available and must not be forced through account creation. Do not add UI or account dependencies merely because an entity exists in the schema; implement the account workflows and relationships specified in Sections 39-42. Admin users must authenticate, and suppliers still require GMO review before publication.
 
 ### User
 
@@ -478,7 +495,7 @@ Do not duplicate Better Auth's credential, account, session or verification stor
 
 ### Client
 
-Optional client profile linked to a registered `User`.
+Client profile linked one-to-one to a registered `User`. Guest enquiries have no `Client` relation.
 
 - A client may have multiple enquiries.
 - An enquiry may be submitted anonymously.
@@ -1775,33 +1792,16 @@ The default delivery strategy is to validate customer demand and the lead-operat
 
 ## Phase 0 — Audit, product decisions and launch readiness
 
-- Audit the current repository and public GrowMeOnline website as product/market reference. This project is a greenfield implementation; do not extend, migrate or integrate with the public site's code, database or media.
+- Audit the current GrowMeOnline website, repository, hosting, domain, analytics, SEO, content, mobile experience, forms, database and integrations.
+- Decide whether to extend the existing website or rebuild only after documenting code quality, maintainability, performance, design constraints, SEO migration risk, cost and delivery impact.
+- Preserve existing URLs and search equity where possible; document redirects before changing routes.
 - Confirm the initial service categories and geographic pilot area. Do not launch broad national coverage before supplier coverage is real.
 - Confirm the customer promise, service boundaries, enquiry handling hours and response expectations.
 - Confirm the pilot supplier cohort, manual operating capacity and the pilot lead-entitlement policy.
 - Confirm privacy notice, enquiry disclosure, consent wording, retention rules and contact-verification approach with appropriate review.
-- Keep development, test data and the database local. Migrations, seeds and destructive resets are allowed against an isolated local test database. Never run them against a production or hosted database unless it has been explicitly designated as disposable test infrastructure.
-- Do not deploy the application or provision production services before development is complete. Decide hosting, production secrets, backups and deployment with the product owner afterward.
+- Configure production-grade PostgreSQL, backups, environments, secrets and deployment workflow.
 
-**Exit criteria:** Greenfield decision and pilot defaults are recorded; local development environment is safe and isolated; customer journey and operating workflows are scoped; remaining legal, verification and commercial decisions are listed for review.
-
-### Phase 0 pilot defaults — 25 November 2026
-
-The product owner directed the engineering agent to select and record practical defaults for the greenfield pilot. These are provisional pilot settings, not permanent changes to the commercial model or a claim that local demand has already been proven.
-
-- Build GrowMeOnline from scratch in this repository; treat the public GrowMeOnline website as product/market reference only. Do not copy its implementation, database, media or credentials.
-- Keep all application development, test data and databases local. Migrations, seeds and resets are permitted against an isolated local test database. Do not deploy the app or provision production services until development is complete; decide deployment with the product owner afterward. Do not use the current hosted Neon URL for destructive tests unless it is explicitly confirmed as disposable.
-- Start in Gauteng, initially Johannesburg and Pretoria.
-- Test non-emergency home repairs and maintenance, with plumbing, electrical and handyman subcategories. Validate demand and supplier capacity before public launch.
-- Require at least five approved, verified suppliers with confirmed service-area coverage for each subcategory/city before listing it publicly; recruit toward ten before increasing paid acquisition.
-- Staff the pilot Monday-Friday, 08:00-17:00 SAST, excluding South African public holidays. Tell customers that enquiries are reviewed during staffed hours and normally within one business day; do not promise emergency, same-hour or job outcomes.
-- Request supplier availability for each enquiry; allow four staffed business hours, make one manual follow-up and mark no response by the next business day.
-- For a general enquiry, dispatch to no more than three confirmed-available suppliers after admin approval. For a supplier-specific enquiry, contact only that supplier; if unavailable or ineligible, ask the customer before offering alternatives.
-- Manually verify the customer's selected contact channel before sharing details with suppliers and record the result. Keep marketing consent separate from service communications. Defer OTP, WhatsApp automation and marketing campaigns until justified and reviewed.
-- Apply the five-free-qualified-assignment allowance once per verified business for its lifetime. A committed assignment consumes quota once in the dispatch transaction. After the fifth assignment, stop new dispatch until an active paid entitlement is confirmed; do not create an undocumented unlimited-free pilot exception.
-- Run a six-week pilot with weekly operational reviews. Measure funnel conversion and staff time, then set expansion thresholds from observed baseline data rather than inventing performance targets in advance.
-- Begin acquisition with direct supplier recruitment, organic/local SEO, referrals and social experiments. Defer paid campaigns until supplier coverage and a baseline are established.
-- Obtain appropriate South African privacy/legal review of notices, consent, retention, contact verification and operating roles before processing live customer enquiries. Confirm Information Officer obligations and complete an appropriate privacy impact assessment.
+**Exit criteria:** Existing-platform audit is documented; extend/rebuild decision is approved; pilot categories/areas, customer journey, supplier operations, privacy requirements and measurable pilot goals are agreed.
 
 ## Phase 1 — Customer-facing website and enquiry capture
 
@@ -1865,6 +1865,10 @@ The product owner directed the engineering agent to select and record practical 
 - Cost and staff time per qualified enquiry.
 
 **Exit criteria:** The team can show whether demand exists, which categories/areas work, whether suppliers respond, whether customers get useful introductions and whether the operating model is commercially plausible.
+
+### v2.6 scope override and execution order
+
+The account and supplier-profile scope committed in Sections 39-42 is part of the current implementation objective; it is not blocked on completing a live pilot first. The older Phase 4 deferral of supplier/customer self-service is superseded for the specifically committed registration, profile, admin review and account-linked enquiry workstreams. This does not pull all automation, advanced marketplace features or payment activation forward. Provider-dependent and policy-dependent behavior remains disabled until its decision gate is met. Track repository-specific dependencies and evidence in `docs/IMPLEMENTATION-PLAN.md` and `docs/IMPLEMENTATION-STATUS.md`.
 
 ## Phase 4 — Supplier self-service and operational automation
 
@@ -1965,7 +1969,7 @@ Do not block unrelated development while these are open. Implement the parts tha
 
 ## MVP-first implementation rule (v2.2)
 
-When asked to build or plan a feature, first classify it as MVP-critical, pilot-supporting or post-pilot. Default to the smallest safe implementation that validates customer demand and supports admin-operated matching. Do not build supplier/customer account experiences, payment checkout, advanced AI matching or complex automation ahead of the six-phase roadmap in Section 23 unless the product owner explicitly changes priorities.
+When asked to build or plan a feature, first classify it as MVP-critical, pilot-supporting or post-pilot. Default to the smallest safe implementation that validates customer demand and supports admin-operated matching. Do not build supplier/customer account experiences, payment checkout, advanced AI matching or complex automation ahead of the six-phase roadmap in Section 23 unless the product owner explicitly changes priorities. Sections 39-42 are the explicit v2.6 override for supplier/client accounts and complete supplier profiles; payment activation and other provider-dependent features remain gated.
 
 Before modifying the existing website, inspect the repository and current implementation. Do not assume a rebuild is required. Keep PostgreSQL/application services as the production source of truth; do not create a parallel Sheets/Airtable production workflow. Keep secure admin access, consent, audit logs, data validation, idempotency and server-side authorization in scope even when deferring customer/supplier dashboards.
 
@@ -2784,7 +2788,7 @@ The MVP is ready for a controlled pilot only when:
 16. Basic funnel and operational metrics are available.
 17. Critical journeys, backup/restore and privacy controls are tested.
 
-A full supplier dashboard, customer accounts, online payments and advanced AI are not MVP completion requirements.
+For controlled-pilot launch, a full supplier dashboard, client accounts, online payments and advanced AI are not prerequisites. However, the current v2.6 project-completion scope does require the client/supplier account and profile acceptance criteria in Sections 39-42. Payment activation and advanced AI remain separately gated.
 
 ---
 
@@ -2865,7 +2869,7 @@ GrowMeOnline should be built around these principles:
 9. **Tested invariants:** critical rules are protected by automated tests.
 10. **Documented decisions:** business and engineering changes are explicit and reviewable.
 
-**This v2.5 document is the current GrowMeOnline engineering master specification.** It preserves the supplier onboarding, six-stage process, admin-led enquiry review, five-free-qualified-assignment allowance, and personal business pages; it now offers R200/month and R1,200/year subscription choices, while retaining the customer acquisition/conversion direction, privacy, security, concurrency, integration and testing controls.
+**This v2.6 document is the current GrowMeOnline engineering master specification.** It preserves the supplier onboarding, six-stage process, admin-led enquiry review, five-free-qualified-assignment allowance, and personal business pages; it offers R200/month and R1,200/year subscription choices, and now commits supplier/client accounts and complete supplier profiles while retaining the customer acquisition/conversion direction, privacy, security, concurrency, integration and testing controls.
 
 The v2.1 specification preserves the v2.0 business invariants and extends the product with a Bark-inspired dual-discovery marketplace, guided quote requests, richer supplier tools, reviews, trust controls and lead-quality operations. Bark's credit-based pricing is benchmark research only; it does not replace GMO's current annual subscription model. The specification becomes the active implementation standard after the product owner confirms the open commercial and operational decisions in Sections 25 and 35.
 
@@ -2878,5 +2882,548 @@ The v2.1 specification preserves the v2.0 business invariants and extends the pr
 - **v2.3 — 24 November 2026:** Added screenshot-derived GrowMeOnline brand palette and semantic UI token guidance. Primary teal `#135858`, deep navy `#020618`, muted blue-grey `#62748E`, and logo lime `#ABC945`; marked provisional neutral recommendations and required CSS/contrast verification during the existing-site audit.
 
 
+- **v2.2 — 24 November 2026:** Added MVP-first delivery strategy, existing-site audit gate, simplified customer and admin-operated launch scope, Kandua/Snupit benchmark, customer contact verification and consent requirements, per-enquiry supplier availability confirmation, social acquisition experiments, pilot metrics and phased deferral of supplier/customer self-service, payments and advanced AI. Preserved v2.1 architecture and approved commercial invariants.
+- **v2.1 — 22 November 2026:** Added Bark-inspired marketplace benchmark, dual customer discovery, supplier experience, reviews/trust, matching fairness, admin marketplace operations and extended marketplace roadmap.
+
+
+
+---
+
+# 38. Mandatory AI development execution contract — v2.6
+
+This section governs every AI coding agent, autonomous coding assistant, developer agent or human developer working on GMO. It takes priority over older wording that described supplier/customer self-service as deferred. The product owner has now explicitly requested implementation of supplier registration, client registration and complete supplier business pages.
+
+## 38.1 Primary instruction: implement, do not merely advise
+
+When the product owner asks to build, implement, complete, fix or update a feature, the agent must work toward a functioning, integrated result in the available repository.
+
+The agent must not stop at:
+- A proposal, architecture explanation or checklist when implementation was requested.
+- A Prisma schema without the corresponding migrations, data access and UI integration.
+- A UI mockup or static page with hard-coded sample data.
+- A form that does not persist valid submissions.
+- A button that has no real action.
+- An API/Server Action without authorization, validation and error handling.
+- A successful TypeScript build while core user journeys remain broken.
+- A statement that a feature is complete without running the relevant checks.
+
+The agent must inspect, plan briefly, implement, verify, fix and report. Do not ask for approval at every small engineering step. Ask before destructive changes, irreversible external actions, material business-policy changes, paid-provider activation or decisions that this specification explicitly reserves for the product owner.
+
+If the environment prevents completion (missing repository access, credentials, provider account, unavailable runtime or user action), implement all independent work that can safely be completed, clearly identify the exact blocker, and provide the smallest next action needed. Never pretend that blocked work is complete.
+
+## 38.2 Mandatory repository-first workflow
+
+Before changing code:
+
+1. Inspect the repository tree, package manager, lockfile, README, environment example, Next.js version, Prisma version, auth setup, database schema, migrations, UI conventions, routing and tests.
+2. Read the relevant existing files before editing them.
+3. Identify the actual deployed/current application and distinguish it from old experiments or unused starter code.
+4. Check the existing website and repository before recommending a rebuild. Extend the current implementation if it is sound.
+5. Record a concise implementation plan and the files/modules likely to change.
+6. Identify schema impact, data migration risk, authorization boundaries, privacy implications and external dependencies.
+7. Reuse existing patterns and installed libraries. Do not add dependencies when the existing stack already solves the problem.
+8. Do not replace configuration, auth, routing, styling or database architecture wholesale without a documented technical reason.
+
+Do not assume that a file, route, model or feature exists merely because it is described in this skill. Confirm it in the repository.
+
+## 38.3 Execution loop
+
+For each requested feature, use this loop:
+
+1. **Understand:** translate the request into observable user stories and acceptance criteria.
+2. **Inspect:** locate current implementation and dependencies.
+3. **Plan:** break the work into small, ordered tasks.
+4. **Implement:** complete the database, server logic, UI, permissions and integrations together.
+5. **Validate:** run formatting/lint, type checks, Prisma validation, migration checks, unit/integration tests and relevant browser tests.
+6. **Fix:** investigate and fix failures caused by the change. Do not hide errors, weaken types or skip tests to obtain a green result.
+7. **Review:** inspect changed files, authorization paths, data exposure, accessibility, responsive behavior and error states.
+8. **Document:** update README/setup instructions, environment variable examples, relevant architecture decision records and this skill when a canonical rule changes.
+9. **Report:** state what was implemented, key files/models/routes, commands actually run, results, unresolved blockers and manual verification steps.
+
+After a failed check, continue working on the failure when it is within scope. Do not simply paste an error log and stop.
+
+## 38.4 Definition of done
+
+A feature is complete only when all applicable conditions are met:
+
+- The feature is connected to real persisted application data.
+- Server-side validation and authorization are implemented.
+- Loading, empty, success and failure states exist.
+- Responsive layouts work on mobile and desktop.
+- Keyboard use, labels, focus states and accessible feedback are addressed.
+- Duplicate submissions and retry behavior are handled.
+- Sensitive fields are not exposed in public responses or logs.
+- Relevant tests pass, or an explicit environment limitation is documented.
+- Database migrations are committed and safely applicable.
+- No unresolved placeholder buttons, TODO stubs or fake success messages remain in the delivered flow.
+- Documentation and environment examples are updated.
+- The agent gives truthful evidence of checks performed.
+
+Do not claim production readiness solely because a local build passes. Production readiness also requires real environment configuration, deployed database migration, secrets, domain/HTTPS, storage, email deliverability, backups, monitoring and a production smoke test.
+
+## 38.5 Engineering discipline
+
+- Work in small coherent changes; preserve unrelated user work.
+- Never overwrite or delete user data, production data, migrations or configuration without a safe plan and authorization.
+- Never use `prisma db push` as a substitute for reviewed migrations in a production workflow.
+- Never put secrets in source code, client bundles, logs, screenshots or committed `.env` files.
+- Never bypass TypeScript or lint checks with broad `any`, `@ts-ignore`, disabled rules or suppressed errors merely to finish faster.
+- Prefer clear modular-monolith boundaries: domain/service layer, data access, validation, UI and integrations.
+- Keep business rules in server-side services, not only in React components.
+- Use transactions for multi-record business operations and idempotency for retryable operations.
+- Add or update tests whenever behavior changes.
+- Do not generate invented seed businesses, fake reviews, fabricated verification badges or misleading production metrics.
+- Use synthetic fixtures only in clearly separated development/test environments.
+
+---
+
+# 39. v2.6 committed implementation scope
+
+The following is the next major delivery scope. It is not merely a future suggestion. AI agents working in the repository must implement these features when asked to execute the GMO build, in the order below, unless repository findings require a documented adjustment.
+
+## 39.1 Delivery order
+
+### Workstream A — Foundation and audit
+- Audit existing website and codebase.
+- Confirm actual stack and dependency versions.
+- Confirm Better Auth configuration and Prisma 7 adapter/generator configuration.
+- Confirm database connection and migration history.
+- Confirm Cloudflare R2 or selected S3-compatible storage setup.
+- Confirm email provider and transactional email sender/domain.
+- Confirm GMO theme tokens and existing component conventions.
+- Create/update `docs/TECH-STACK.md`, `docs/IMPLEMENTATION-PLAN.md` and relevant ADRs.
+- Establish baseline lint, typecheck, test and build commands.
+
+### Workstream B — Identity and authentication
+Implement real registration, sign-in, sign-out, email verification, password reset and session management using the installed, supported Better Auth integration.
+
+Required user capabilities:
+- Register with email and password where supported by the configured auth method.
+- Sign in and sign out.
+- Verify email before privileged supplier submission or sensitive account actions.
+- Request password reset and securely complete it.
+- View and update their own account details.
+- Receive safe, understandable feedback for invalid credentials, duplicate email, expired verification/reset links and rate limits.
+
+Security requirements:
+- Use Better Auth's supported APIs and generated schema for the installed version. Do not hand-invent or duplicate `Account`, `Session` or `Verification` models.
+- Enforce server-side authorization for every protected read and write.
+- Use secure cookies and production-appropriate cookie settings.
+- Rate-limit registration, login, password reset, verification resend and other abuse-prone endpoints.
+- Do not reveal whether an arbitrary email address has an account beyond what the auth flow safely permits.
+- Do not store plaintext passwords or tokens.
+- Never trust a role, user ID, supplier ID or client ID supplied by the browser without deriving/authorizing it from the authenticated session and database.
+- Add tests for unauthorized access, cross-account access and role escalation attempts.
+
+### Workstream C — Supplier registration and onboarding
+
+Implement a complete supplier journey:
+
+1. Supplier user creates an account or signs in.
+2. Supplier verifies email.
+3. Supplier chooses to create a supplier/business profile.
+4. Supplier enters required business identity and contact information.
+5. Supplier selects one primary category and any additional categories they genuinely provide.
+6. Supplier selects province, city/town and service areas.
+7. Supplier adds a unique public business slug or accepts a generated suggestion.
+8. Supplier adds business description and relevant service offerings.
+9. Supplier uploads logo, cover image and optional gallery images.
+10. Supplier adds public contact preferences and optional website/social links.
+11. Supplier reviews the profile and submits it for admin review.
+12. Supplier sees submission status and admin requests for changes.
+13. Supplier edits and resubmits when changes are requested.
+14. Supplier can see approval/verification state and public profile URL after publication.
+
+Supplier onboarding must:
+- Save drafts progressively or provide safe explicit draft saving.
+- Show validation errors next to relevant fields and a summary for long forms.
+- Preserve entered data when validation fails.
+- Support mobile-first multi-step forms with progress and back navigation.
+- Prevent submission when required fields are incomplete.
+- Prevent suppliers from setting their own `APPROVED`, `isVerified`, `isIndexable`, featured or trust-badge fields.
+- Restrict edits to the supplier's own business profile.
+- Route public content changes through the approved moderation policy where required.
+- Keep internal verification notes and evidence private.
+- Record lifecycle transitions in an audit/review history.
+- Never imply that email or phone verification alone means the business itself has been independently vetted.
+
+### Workstream D — Client/customer registration and account
+
+Implement client registration and account management without adding friction to anonymous enquiries.
+
+Client features:
+- Create a client account and verify email.
+- Sign in/out and reset password.
+- Maintain their own name and contact preferences.
+- View and update their own profile.
+- View their own enquiry history and current statuses.
+- View the supplier introduction/contact details only where the enquiry was legitimately assigned and disclosure is permitted.
+- Update or withdraw communication preferences where applicable.
+- Request account deletion or privacy action through a documented workflow.
+
+Guest enquiry policy remains:
+- A visitor may submit an enquiry without creating an account.
+- Guest enquiry contact details are captured and protected in the Enquiry record.
+- If a guest later registers, account linking must use verified contact ownership and a secure linking process. Never link enquiries based only on an unverified matching email/phone string.
+- A registered customer may submit enquiries while signed in; the server associates the enquiry with the authenticated client profile.
+- A client must never access another client's enquiries by changing a URL, ID or request payload.
+
+### Workstream E — Complete supplier business profile and public page
+
+Create a polished, mobile-first public business page backed by canonical supplier data. Use the existing public route convention if present; otherwise use the approved `/b/[slug]` convention or document the chosen route before implementation.
+
+The public page should support, when available and approved:
+- Business name and logo.
+- Cover image and gallery.
+- Business description / about section.
+- Primary and additional service categories.
+- Specific service offerings.
+- Province, city and approved service areas.
+- Public contact actions (call, website, email or WhatsApp only when intentionally public).
+- Business hours only when supplied and verified.
+- Social links.
+- Genuine moderated reviews only if the review feature and review eligibility policy are implemented.
+- Verification label that accurately states what GMO checked.
+- Clear request-a-quote/contact CTA.
+- Breadcrumbs and internal links to relevant category and location pages.
+- Profile last-updated information only if it adds genuine value and is not misleading.
+
+Public page behavior:
+- Only approved, verified, active and non-deleted suppliers may be returned by public queries.
+- Draft/pending/suspended/rejected profiles must return a safe not-found or unavailable response to public visitors and must not leak data in metadata, JSON-LD, sitemap, search results, API responses or cached output.
+- Owners may preview their own unpublished profile only through an authenticated, authorized, non-indexable, non-publicly-cacheable preview route.
+- A supplier's own business-page enquiry must set the target supplier explicitly but still enter GMO's normal review and dispatch workflow.
+- Public contact details must be controlled field-by-field by supplier settings and GMO privacy rules.
+- Do not display personal home addresses for service-area businesses unless the supplier explicitly provides a public business address and has authority to publish it.
+
+### Workstream F — Supplier profile data and media
+
+Use PostgreSQL as the source of truth for business and media metadata. Store actual image/document bytes in Cloudflare R2 or the approved object store, not PostgreSQL.
+
+Media workflow:
+1. Authenticated supplier/admin requests an upload authorization.
+2. Server checks role, ownership, file purpose, file size and allowed MIME types.
+3. Upload uses a short-lived signed URL or secure server-mediated upload.
+4. Server verifies the uploaded object and records a `MediaAsset`.
+5. Image processing creates appropriately sized/optimized variants where configured.
+6. The profile references the media asset through a stable storage key/asset ID.
+7. Deletion removes or schedules removal of the object and updates database state safely.
+
+Requirements:
+- Use random, non-guessable object keys; do not trust user filenames as storage paths.
+- Validate actual file type, not just extension or browser MIME claim.
+- Set size limits and image dimension limits.
+- Reject executable or unsupported file formats.
+- Protect private verification documents and enquiry attachments from public access.
+- Use separate public/private media policies.
+- Avoid permanent dependence on a hard-coded public storage URL; store object key and derive delivery URL through a configured CDN/base URL.
+- Store alt text, purpose, dimensions, MIME type, byte size, owner, upload status and timestamps where relevant.
+- Prevent one supplier from attaching, replacing or deleting another supplier's media.
+- Use safe deletion and orphan cleanup procedures.
+- Do not expose R2 credentials in browser code.
+
+### Workstream G — Admin supplier operations
+
+Implement the admin workflows required to operate supplier onboarding:
+
+- Supplier list with search, filters, pagination and status.
+- Supplier detail/review screen.
+- Review business details, categories, service areas and media.
+- Review verification evidence privately.
+- Approve, request changes, reject or suspend with required reason.
+- Record who performed each action and when.
+- Verify phone/email/business evidence only according to the documented verification policy.
+- Manage public visibility and indexability separately from supplier approval.
+- Edit/correct supplier public content with audit trail.
+- Manage categories and location reference data with safe controls.
+- Preview the public profile before publication.
+- See profile completeness without confusing it with verification.
+- View a supplier's lead entitlement and assignment history, but do not allow profile admins to bypass quota rules.
+
+Every admin action must be authorized on the server using explicit role/permission checks. Hiding admin buttons in the UI is not authorization.
+
+### Workstream H — SEO and discovery
+
+For eligible supplier pages:
+- Generate unique title and meta description from approved data with sensible fallbacks.
+- Allow admin-edited SEO title/description where appropriate.
+- Generate canonical URL from configured production origin and canonical slug.
+- Generate Open Graph/Twitter metadata.
+- Generate JSON-LD using the most specific truthful Schema.org business subtype that fits the supplier.
+- Include only visible, accurate and approved facts in structured data.
+- Generate sitemap entries only for approved, verified, indexable profiles.
+- Use `noindex` for preview, account, admin, draft, pending, suspended and thin/duplicate pages as appropriate.
+- Ensure public page content is server-rendered or otherwise reliably crawlable.
+- Use descriptive image alt text and responsive image delivery.
+- Add breadcrumbs and crawlable internal links.
+- Handle slug changes with a redirect/history strategy to preserve links.
+- Do not generate mass thin location/category doorway pages.
+- Do not invent ratings, review counts, opening hours, qualifications, addresses or service areas.
+- Structured data does not guarantee rich results or ranking.
+
+### Workstream I — Enquiries connected to accounts and business pages
+
+- Keep one canonical `Enquiry` model and one canonical enquiry creation service.
+- Enquiries may be submitted by guests or registered clients.
+- Store optional `clientId` when the authenticated client submits.
+- Store optional `targetSupplierId` for a request originating from a supplier business page.
+- Store the category-question template/version used at submission.
+- Capture channel-specific consent and privacy notice version.
+- Use the same server-side validation, spam prevention and duplicate controls for every entry path.
+- Public pages must not send customer PII directly to suppliers.
+- All enquiries begin in `PENDING_REVIEW`.
+- Admin review and dispatch remain mandatory.
+- Keep customer enquiry history scoped to the authenticated owner.
+- Record customer-facing status updates without disclosing internal review notes.
+
+### Workstream J — Subscription and entitlement integration
+
+- Preserve five free qualified lead assignments as the current baseline.
+- After free assignments, support the approved R200/month and R1,200/year options.
+- Do not activate paid entitlement based on a client-side redirect or browser state.
+- Keep billing provider integration behind a server-side adapter.
+- Complete checkout only after product owner has approved provider, recurring billing, VAT/tax treatment, renewals, grace period, cancellation and refunds.
+- Until provider configuration is approved, build plan display and entitlement logic with payment activation safely disabled or in an explicitly approved pilot mode.
+- Monthly and annual plans share the same core matching/lead eligibility rules unless a later approved plan feature matrix says otherwise.
+- Do not silently grant free leads or bypass quota during tests or pilot operations; use an explicit environment-scoped entitlement policy.
+
+## 39.2 Suggested route map
+
+Adapt to the existing repository conventions. Do not create duplicate routes if equivalent routes already exist.
+
+Public:
+- `/` — homepage.
+- `/services` or `/categories` — service discovery.
+- `/services/[categorySlug]` — category page where useful and indexable.
+- `/locations/[locationSlug]` — meaningful location page where useful and indexable.
+- `/b/[slug]` — public supplier business page.
+- `/register` — account registration entry.
+- `/login` — sign in.
+- `/request/[categorySlug]` or equivalent — guided enquiry journey.
+- `/privacy` and `/terms` — approved legal notices.
+
+Supplier:
+- `/supplier/onboarding` — create/complete profile.
+- `/supplier/dashboard` — supplier home.
+- `/supplier/profile` — edit own business profile.
+- `/supplier/media` — manage media if a separate page is useful.
+- `/supplier/leads` — assigned lead history, only when supplier lead access is enabled.
+- `/supplier/settings` — account and contact preferences.
+- `/supplier/subscription` — plan and entitlement view.
+
+Client:
+- `/client/dashboard` — client home.
+- `/client/profile` — personal profile.
+- `/client/enquiries` — own enquiry history.
+- `/client/enquiries/[reference]` — own enquiry detail, safe public reference plus authorization.
+
+Admin:
+- `/admin/suppliers` and `/admin/suppliers/[id]`.
+- `/admin/clients` only where operationally necessary and with privacy controls.
+- `/admin/enquiries` and `/admin/enquiries/[id]`.
+- `/admin/categories`, `/admin/locations`.
+- `/admin/media` or moderation view where needed.
+- `/admin/audit` restricted to authorized roles.
+
+## 39.3 Suggested service/module boundaries
+
+Reuse existing modules where present. A reasonable modular-monolith layout is:
+
+- `auth`: Better Auth configuration and session helpers.
+- `users`: account identity and role/permission operations.
+- `clients`: client profile and ownership-scoped queries.
+- `suppliers`: supplier profile lifecycle and ownership-scoped queries.
+- `catalog`: categories, offerings, province/city/suburb reference data.
+- `media`: upload authorization, storage adapter, metadata and cleanup.
+- `directory`: public supplier queries, filters and profile rendering data.
+- `seo`: metadata, canonical URLs, JSON-LD and sitemap eligibility.
+- `enquiries`: canonical enquiry creation, guest/client paths and validation.
+- `matching`: deterministic supplier eligibility and match explanations.
+- `dispatch`: admin-confirmed assignment, quota and outbox transaction.
+- `subscriptions`: plans, payments, provider adapter and entitlement calculation.
+- `notifications`: email/WhatsApp adapters and delivery attempts.
+- `admin`: permissions, moderation, review workflows and audit.
+- `analytics`: acquisition and conversion events.
+
+Keep database access on the server. Do not import server-only database clients into client components.
+
+## 39.4 Data-model guidance
+
+Before adding fields/models, inspect the current schema and reuse existing canonical models. The following logical entities should be represented without duplication:
+
+- `User`: authentication identity and role/permission source.
+- `Client`: optional client-specific profile related one-to-one to User.
+- `Supplier`: business profile, owner relation, lifecycle status and approved public fields.
+- `Category`, `SupplierCategory`, `SupplierOffering`.
+- `Province`, `City`, `Suburb`, `SupplierServiceArea`.
+- `MediaAsset`: object storage metadata and ownership.
+- `SupplierReviewEvent` / `SupplierVerification` or equivalent audit-safe lifecycle records.
+- `Enquiry`, `EnquiryAttachment`, `LeadAssignment`, `DispatchOperation`, `QuotaLedger`.
+- `ConsentRecord`, `AuditLog`, `OutboxEvent`, `Notification`, `DeliveryAttempt`.
+- `Subscription`, `Payment`, `PaymentWebhookEvent`, `SubscriptionEvent`.
+- `LeadActivity` or an equivalent operational event model where follow-up activity is not already represented.
+
+Do not add `SupplierSEO` as a separate table merely to store a few title/description fields unless there is a clear future requirement. SEO fields may live on `Supplier`. Likewise, do not duplicate logo/cover URLs if a canonical MediaAsset relation is adopted; choose one consistent source of truth and document the decision.
+
+Better Auth adapter tables must follow the installed Better Auth version's official schema. Do not add a second password store or duplicate auth sessions.
+
+## 39.5 Security and privacy acceptance criteria
+
+Every implementation must demonstrate:
+- A supplier cannot read/update another supplier's draft or private profile.
+- A client cannot read/update another client's profile or enquiries.
+- A normal user cannot promote their own role to admin.
+- A supplier cannot approve or verify themselves.
+- A supplier cannot publish private media or verification documents.
+- An unauthenticated user cannot access dashboards or private endpoints.
+- Public pages expose only approved public fields.
+- Pending/suspended supplier data is absent from public API, search, metadata, JSON-LD and sitemap.
+- Admin actions require explicit server-side permissions and are audited.
+- Customer contact data is disclosed only after legitimate, authorized assignment and in accordance with consent/policy.
+- Upload endpoints validate ownership, content type, size and object key.
+- Rate limits and abuse controls protect auth and public enquiry endpoints.
+- Logs and error messages do not leak secrets or unnecessary personal data.
+
+Add automated tests for these cases, not just manual assertions.
+
+---
+
+# 40. End-to-end feature acceptance matrix
+
+An AI agent must use this matrix when implementing the account and supplier-profile scope. Mark each item complete only after implementation and verification.
+
+## 40.1 Supplier registration
+- [ ] Registration and sign-in work with the configured Better Auth provider.
+- [ ] Email verification works in the configured environment.
+- [ ] Password reset works.
+- [ ] Supplier can create a draft business profile.
+- [ ] Supplier can save and resume onboarding.
+- [ ] Required business fields validate server-side.
+- [ ] Categories and service areas are selected from canonical records.
+- [ ] Supplier can upload logo, cover and gallery media securely.
+- [ ] Supplier can submit for review.
+- [ ] Supplier sees pending/changes-requested/approved state.
+- [ ] Supplier can edit and resubmit when permitted.
+- [ ] Supplier cannot self-approve or set verification/indexing fields.
+
+## 40.2 Client registration
+- [ ] Client can register, verify email, sign in and reset password.
+- [ ] Client can update their own profile.
+- [ ] Client can submit an enquiry while signed in.
+- [ ] Guest can still submit an enquiry without registering.
+- [ ] Registered client sees only their own enquiries.
+- [ ] Guest-to-account linking requires verified ownership.
+- [ ] Customer can view safe status information and permitted supplier introduction details.
+
+## 40.3 Supplier business page
+- [ ] Unique, stable public slug and correct canonical URL.
+- [ ] Approved supplier profile renders from database.
+- [ ] Business details, services, categories and service areas are accurate.
+- [ ] Media assets render with appropriate responsive sizes and alt text.
+- [ ] Public contact actions respect supplier visibility settings.
+- [ ] Business-page enquiry targets the correct supplier and enters normal GMO review.
+- [ ] SEO metadata and JSON-LD reflect only accurate visible content.
+- [ ] Only approved, verified and indexable profiles enter sitemap.
+- [ ] Pending/suspended profiles cannot be accessed or indexed.
+- [ ] Slug change preserves old URL through a safe redirect policy.
+
+## 40.4 Admin and operations
+- [ ] Admin can search and review supplier submissions.
+- [ ] Admin can approve/request changes/reject/suspend with reasons.
+- [ ] Verification method and evidence are recorded appropriately.
+- [ ] Admin can preview profile before publication.
+- [ ] Admin actions are permission-checked and audited.
+- [ ] Admin can manage categories and locations safely.
+- [ ] Admin can control indexing independently from approval.
+- [ ] Profile completeness and verification status are distinct.
+
+## 40.5 Quality gates
+- [ ] Prisma schema validates with installed Prisma version.
+- [ ] Migrations are generated, reviewed and applied to development database.
+- [ ] TypeScript check passes.
+- [ ] Lint/format checks pass.
+- [ ] Unit and integration tests pass.
+- [ ] Playwright tests cover the critical registration and profile journeys.
+- [ ] Responsive and accessibility checks are performed.
+- [ ] Production build succeeds.
+- [ ] Environment variable documentation is complete.
+- [ ] No secrets or production personal data are committed.
+- [ ] Setup and deployment instructions are updated.
+- [ ] Final report lists actual commands and results.
+
+---
+
+# 41. AI agent task management and progress reporting
+
+For a multi-feature build, the agent must maintain a durable implementation checklist in the repository, preferably `docs/IMPLEMENTATION-STATUS.md`.
+
+For each workstream record:
+- Status: `NOT_STARTED`, `IN_PROGRESS`, `BLOCKED`, `IN_REVIEW`, `DONE`.
+- Acceptance criteria.
+- Files/modules changed.
+- Schema/migration impact.
+- Tests added and commands run.
+- Known issues and blockers.
+- Next concrete action.
+
+Rules:
+1. Do not mark a task `DONE` because code was generated; mark it done only after its acceptance criteria are met.
+2. Keep the status document current as work progresses.
+3. If context limits or session termination interrupts work, leave the repository in a coherent state and update the status document with exact next steps.
+4. On resuming, read `docs/IMPLEMENTATION-STATUS.md`, inspect git status and continue from the first incomplete dependency.
+5. Do not redo completed work without a reason.
+6. Do not claim that work continues in the background after the session ends unless an actual supported background execution system has been configured.
+7. When asked to complete all listed features, work through dependencies and do not stop after the first page or model.
+
+## 41.1 Required completion report
+
+At the end of a development task, report:
+- Completed features and user journeys.
+- Database models/migrations changed.
+- Routes and server actions/API handlers added or changed.
+- Authorization and privacy controls implemented.
+- Tests and commands actually run, with pass/fail outcomes.
+- Any failed checks and whether they were fixed.
+- Environment variables or external provider setup still required.
+- Manual steps the product owner must perform.
+- Remaining blockers and exact next implementation task.
+
+Do not use vague statements such as "fully done" if a provider integration, deployment, email verification or production migration remains untested.
+
+---
+
+# 42. v2.6 scope and prioritization clarification
+
+The supplier registration, client registration and complete supplier business-page workstreams are now explicitly in scope and should be completed as a connected product experience. The earlier v2.2 decision to defer customer accounts and supplier self-service was a launch prioritization at that time; this v2.6 instruction supersedes that deferral for the current implementation objective.
+
+This does not mean every future marketplace capability must be built at once. The following remain separate or later unless explicitly requested:
+- Advanced supplier CRM and sales pipeline automation.
+- Automated WhatsApp campaigns and bulk messaging.
+- Dormant-lead reactivation for supplier-owned databases.
+- AI-driven autonomous supplier approval, enquiry qualification or dispatch.
+- Revenue-share or pay-on-sale billing.
+- Advanced review/ranking systems without an approved trust and moderation policy.
+- Complex subscription checkout before provider, tax and recurring billing decisions are verified.
+
+The immediate completion target is a secure, working account system for clients and suppliers, a complete supplier onboarding and admin approval workflow, and high-quality public supplier business pages connected to the same canonical data model and enquiry process.
+
+**This v2.6 document is the active GrowMeOnline master implementation specification. When the product owner asks an AI coding agent to build GMO, the agent must follow the repository-first execution contract, implement end-to-end, verify with tests and report evidence.**
+
+# 43. Repository-specific development plan and status
+
+The v2.6 scope is implemented through repository-specific, dependency-ordered documents:
+
+- `docs/IMPLEMENTATION-PLAN.md` defines the current workstreams, dependencies, acceptance criteria, decision gates and explicit non-goals.
+- `docs/IMPLEMENTATION-STATUS.md` records the verified repository baseline, workstream state, test evidence, blockers and next action.
+- `docs/TECH-STACK.md` is a foundation workstream deliverable and must document actual checked-in/runtime versions rather than planned versions.
+
+These documents do not replace Sections 39-40. When they conflict, the master skill and subsequently approved ADRs govern. Keep the status document factual: distinguish code-complete, test-verified, policy-blocked, environment-blocked and production-ready states. Do not run against production data or activate providers as a shortcut to completion.
+
+
+## Version history
+- **v2.6 — 26 November 2026:** Added mandatory end-to-end AI coding-agent execution contract; explicitly committed supplier registration, client registration, complete supplier business pages, admin onboarding/verification, media storage, SEO/discovery, account-linked enquiries, security acceptance criteria, feature completion matrix and durable implementation reporting. Added the repository-specific implementation plan/status requirement and clarified that committed account/profile work is not blocked on live pilot validation. Supersedes earlier deferral of supplier/customer self-service for this requested build scope.
+- **v2.5 — 25 November 2026:** Approved R200/month as a lower-commitment paid subscription option alongside R1,200/year after the five-free-qualified-assignment allowance; documented monthly-to-annual upgrade intent, comparative annual savings, shared core entitlement principle and remaining billing/legal decisions.
+- **v2.4 — 25 November 2026:** Evolved GMO positioning toward customer acquisition and conversion; added RemodelBoom lead-reactivation/revenue-conversion benchmark; made human follow-up and outcome tracking part of pilot operations; defined dormant-lead reactivation as a later consent- and data-governance-gated experiment; corrected version metadata.
+- **v2.3 — 24 November 2026:** Added screenshot-derived GrowMeOnline brand palette and semantic UI token guidance. Primary teal `#135858`, deep navy `#020618`, muted blue-grey `#62748E`, and logo lime `#ABC945`; marked provisional neutral recommendations and required CSS/contrast verification during the existing-site audit.
 - **v2.2 — 24 November 2026:** Added MVP-first delivery strategy, existing-site audit gate, simplified customer and admin-operated launch scope, Kandua/Snupit benchmark, customer contact verification and consent requirements, per-enquiry supplier availability confirmation, social acquisition experiments, pilot metrics and phased deferral of supplier/customer self-service, payments and advanced AI. Preserved v2.1 architecture and approved commercial invariants.
 - **v2.1 — 22 November 2026:** Added Bark-inspired marketplace benchmark, dual customer discovery, supplier experience, reviews/trust, matching fairness, admin marketplace operations and extended marketplace roadmap.
