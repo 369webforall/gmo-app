@@ -1,8 +1,4 @@
-import { config } from 'dotenv';
-import { defineConfig} from 'prisma/config';
-
-config({ path: '.env' });
-config();
+import { defineConfig } from 'prisma/config';
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -10,13 +6,7 @@ export default defineConfig({
     path: 'prisma/migrations',
     seed: 'tsx prisma/seed.ts'
   },
-  // ...your existing config
-  turbopack: {
-    resolveAlias: {
-      '@prisma/client/runtime/library': '@prisma/client/runtime/client',
-    },
-  },
   datasource: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL
   }
 });
