@@ -42,6 +42,10 @@ export function LoginForm({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setLoading] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(
+    null
+  );
 
   type SignInValues = z.infer<typeof signInSchema>;
 
@@ -58,7 +62,7 @@ export function LoginForm({
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard'
+        callbackURL: '/dashboard/client'
       });
     } catch (error) {
       console.error('Google sign-in failed:', error);
@@ -72,6 +76,7 @@ export function LoginForm({
 
   async function onSubmit({ email, password, rememberMe }: SignInValues) {
     setError(null);
+    setVerificationMessage(null);
     setLoading(true);
 
     try {
@@ -94,7 +99,7 @@ export function LoginForm({
       } else {
         form.reset();
         toast.success('Welcome back!');
-        router.push('/dashboard');
+        router.push('/dashboard/client');
       }
     } catch (err) {
       setError(
@@ -102,6 +107,45 @@ export function LoginForm({
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function resendVerificationEmail() {
+    const parsedEmail = signInSchema.shape.email.safeParse(
+      form.getValues('email')
+    );
+    if (!parsedEmail.success) {
+      setVerificationMessage('Enter a valid email address first.');
+      return;
+    }
+
+    setIsResendingVerification(true);
+    setVerificationMessage(null);
+    try {
+      const { error: resendError } = await authClient.sendVerificationEmail({
+        email: parsedEmail.data,
+        callbackURL: '/dashboard/client'
+      });
+
+      if (resendError) {
+        setVerificationMessage(
+          resendError.message ??
+            'We could not request a verification email. Please try again later.'
+        );
+        return;
+      }
+
+      setVerificationMessage(
+        'If this address has an unverified account, a new verification email has been requested. Check your inbox and spam folder.'
+      );
+    } catch (resendError) {
+      setVerificationMessage(
+        resendError instanceof Error
+          ? resendError.message
+          : 'We could not request a verification email. Please try again later.'
+      );
+    } finally {
+      setIsResendingVerification(false);
     }
   }
 
@@ -123,6 +167,30 @@ export function LoginForm({
             {error}
           </Alert>
         )}
+        <div className='space-y-2'>
+          <Button
+            type='button'
+            variant='outline'
+            className='w-full'
+            disabled={isResendingVerification}
+            onClick={resendVerificationEmail}
+          >
+            {isResendingVerification ? (
+              <Spinner />
+            ) : (
+              'Resend verification email'
+            )}
+          </Button>
+          {verificationMessage && (
+            <p
+              className='text-muted-foreground text-center text-sm'
+              role='status'
+              aria-live='polite'
+            >
+              {verificationMessage}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Main Form Area */}

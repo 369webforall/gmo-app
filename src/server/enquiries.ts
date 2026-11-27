@@ -18,6 +18,7 @@ import {
   getPilotCoverage,
   isPilotIntakeEnabled
 } from '@/lib/pilot-readiness';
+import { asyncOptionalAuthenticatedClient } from '@/server/clients';
 
 const enquirySubmissionSchema = z.object({
   submissionKey: z.uuid(),
@@ -382,6 +383,7 @@ export async function createPublicEnquiry(
     select: { id: true }
   });
 
+  const client = await asyncOptionalAuthenticatedClient();
   const publicReference = `GMO-${randomUUID().replaceAll('-', '').toUpperCase()}`;
   const enquiry = await prisma.enquiry.upsert({
     where: { submissionKey: parsed.data.submissionKey },
@@ -389,6 +391,7 @@ export async function createPublicEnquiry(
     create: {
       publicReference,
       submissionKey: parsed.data.submissionKey,
+      clientId: client?.id ?? null,
       categoryId: category.id,
       cityId: city.id,
       possibleDuplicateOfId: possibleDuplicate?.id ?? null,

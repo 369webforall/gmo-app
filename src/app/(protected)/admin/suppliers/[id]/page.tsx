@@ -14,6 +14,7 @@ import { SupplierForm } from '../supplier-form';
 import { SupplierReviewForm } from '../supplier-review-form';
 import { SupplierOwnerLinkForm } from '../supplier-owner-link-form';
 import { SupplierStatusBadge } from '../status-badge';
+import { SupplierMediaReview } from './media-review';
 
 type RouteParams = Promise<{ id: string }>;
 
@@ -71,6 +72,12 @@ async function SupplierDetail({ params }: { params: RouteParams }) {
           </h1>
         </div>
         <div className='flex flex-wrap items-center gap-2'>
+          <Link
+            href={`/admin/suppliers/${supplier.id}/preview`}
+            className='border-border bg-background inline-flex h-9 items-center rounded-xl border px-3 text-xs font-medium'
+          >
+            Private preview
+          </Link>
           <SupplierStatusBadge status={supplier.status} />
           <span className='bg-muted text-muted-foreground inline-flex rounded-full px-2.5 py-1 text-xs font-medium'>
             {supplier.isVerified ? 'Verified' : 'Not verified'}
@@ -116,6 +123,7 @@ async function SupplierDetail({ params }: { params: RouteParams }) {
               supplierId={supplier.id}
               currentStatus={supplier.status}
               isVerified={supplier.isVerified}
+              isIndexable={supplier.isIndexable}
               verificationMethod={supplier.verificationMethod ?? ''}
             />
             {supplier.verifiedAt && (
@@ -124,6 +132,23 @@ async function SupplierDetail({ params }: { params: RouteParams }) {
                 {formatDate(supplier.verifiedAt)}.
               </p>
             )}
+          </section>
+
+          <section className='border-border bg-card rounded-2xl border p-5 sm:p-6'>
+            <h2 className='text-lg font-semibold'>Public contact preferences</h2>
+            <p className='text-muted-foreground mt-1 text-sm'>
+              Contact fields stay private unless the supplier opts in.
+            </p>
+            <dl className='mt-4 grid grid-cols-2 gap-2 text-sm'>
+              <dt>Contact name</dt>
+              <dd>{supplier.isContactNamePublic ? 'Public' : 'Private'}</dd>
+              <dt>Phone</dt>
+              <dd>{supplier.isPhonePublic ? 'Public' : 'Private'}</dd>
+              <dt>Email</dt>
+              <dd>{supplier.isEmailPublic ? 'Public' : 'Private'}</dd>
+              <dt>Website</dt>
+              <dd>{supplier.isWebsitePublic ? 'Public' : 'Private'}</dd>
+            </dl>
           </section>
 
           <section className='border-border bg-card rounded-2xl border p-5 sm:p-6'>
@@ -184,6 +209,7 @@ async function SupplierDetail({ params }: { params: RouteParams }) {
           </section>
         </aside>
       </div>
+      <SupplierMediaReview mediaAssets={supplier.mediaAssets} />
     </main>
   );
 }

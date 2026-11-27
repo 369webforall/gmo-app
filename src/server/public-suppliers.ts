@@ -1,17 +1,23 @@
 import 'server-only';
 
 import prisma from '@/lib/prisma';
+import { filterPublicSupplierContacts } from '@/features/suppliers/public-contact';
 
-const PUBLIC_SUPPLIER_WHERE = {
+export const PUBLIC_SUPPLIER_WHERE = {
   deletedAt: null,
   isActive: true,
   status: 'APPROVED' as const,
+  isIndexable: true,
   isVerified: true,
   AND: [
     { slug: { not: { startsWith: 'simulation-' } } },
     { slug: { not: { startsWith: 'test-only-' } } }
   ]
 };
+
+export async function countPublicSuppliers() {
+  return prisma.supplier.count({ where: PUBLIC_SUPPLIER_WHERE });
+}
 
 export async function listPublicSupplierCategories() {
   return prisma.category.findMany({
@@ -119,6 +125,11 @@ export async function listPublicSuppliers({
           where: { isConfirmed: true, isActive: true },
           select: { city: { select: { name: true, slug: true } } },
           orderBy: { city: { name: 'asc' } }
+        },
+        offerings: {
+          where: { isActive: true },
+          select: { id: true, name: true, description: true },
+          orderBy: { sortOrder: 'asc' }
         }
       },
       orderBy: [{ businessName: 'asc' }, { id: 'asc' }],
@@ -136,7 +147,7 @@ export async function listPublicSuppliers({
 }
 
 export async function getPublicSupplier(slug: string) {
-  return prisma.supplier.findFirst({
+  const supplier = await prisma.supplier.findFirst({
     where: {
       slug,
       ...PUBLIC_SUPPLIER_WHERE
@@ -147,9 +158,14 @@ export async function getPublicSupplier(slug: string) {
       slug: true,
       tagline: true,
       description: true,
+      contactName: true,
       website: true,
       phone: true,
       email: true,
+      isContactNamePublic: true,
+      isPhonePublic: true,
+      isEmailPublic: true,
+      isWebsitePublic: true,
       categories: {
         where: { isConfirmed: true },
         select: {
@@ -171,9 +187,52 @@ export async function getPublicSupplier(slug: string) {
           }
         },
         orderBy: { city: { name: 'asc' } }
+      },
+      offerings: {
+        where: { isActive: true },
+        select: { id: true, name: true, description: true },
+        orderBy: { sortOrder: 'asc' }
+      },
+      mediaAssets: {
+        where: {
+          status: 'READY',
+          purpose: { in: ['LOGO', 'COVER', 'GALLERY'] }
+        },
+        select: {
+          id: true,
+          purpose: true,
+          altText: true,
+          width: true,
+          height: true
+        },
+        orderBy: { createdAt: 'asc' }
       }
     }
   });
+
+  if (!supplier) return null;
+
+  const {
+    isContactNamePublic,
+    isPhonePublic,
+    isEmailPublic,
+    isWebsitePublic,
+    ...publicSupplier
+  } = supplier;
+
+  return {
+    ...publicSupplier,
+    ...filterPublicSupplierContacts({
+      contactName: supplier.contactName,
+      phone: supplier.phone,
+      email: supplier.email,
+      website: supplier.website,
+      isContactNamePublic,
+      isPhonePublic,
+      isEmailPublic,
+      isWebsitePublic
+    })
+  };
 }
 
 export async function listPublicSupplierSlugs() {
@@ -184,4 +243,35 @@ export async function listPublicSupplierSlugs() {
   });
 
   return suppliers.map((supplier) => supplier.slug);
+}
+
+export async function getPublicSupplierForLegacySlug(slug: string) {
+  const history = await prisma.supplierSlugHistory.findUnique({
+    where: { slug },
+    select: {
+      supplier: {
+        select: {
+          slug: true,
+          deletedAt: true,
+          isActive: true,
+          status: true,
+          isVerified: true,
+          isIndexable: true
+        }
+      }
+    }
+  });
+
+  if (
+    !history ||
+    history.supplier.deletedAt ||
+    !history.supplier.isActive ||
+    history.supplier.status !== 'APPROVED' ||
+    !history.supplier.isVerified ||
+    !history.supplier.isIndexable
+  ) {
+    return null;
+  }
+
+  return history.supplier.slug;
 }

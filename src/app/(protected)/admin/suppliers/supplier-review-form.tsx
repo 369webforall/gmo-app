@@ -16,11 +16,13 @@ export function SupplierReviewForm({
   supplierId,
   currentStatus,
   isVerified,
+  isIndexable,
   verificationMethod
 }: {
   supplierId: string;
   currentStatus: SupplierStatus;
   isVerified: boolean;
+  isIndexable: boolean;
   verificationMethod: string;
 }) {
   const [state, formAction, pending] = useActionState(
@@ -68,6 +70,22 @@ export function SupplierReviewForm({
         >
           <option value='false'>Not verified</option>
           <option value='true'>Verified</option>
+        </select>
+      </div>
+
+      <div className='space-y-2'>
+        <label htmlFor='supplier-indexability' className='text-sm font-medium'>
+          Public indexability
+        </label>
+        <select
+          id='supplier-indexability'
+          name='isIndexable'
+          required
+          defaultValue={String(isIndexable)}
+          className={inputClassName}
+        >
+          <option value='false'>No index / private public visibility</option>
+          <option value='true'>Indexable public profile</option>
         </select>
       </div>
 

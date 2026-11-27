@@ -1,31 +1,64 @@
 import { DashboardGate } from '@/components/dashboard/auth-gate';
-import { RecentActivity } from '@/components/dashboard/recent-activity';
-import { StatsCards } from '@/components/dashboard/stats-cards';
-import { UpgradeBanner } from '@/components/dashboard/upgrade-banner';
+import { Card } from '@/components/ui/card';
 import { isAuthenticated } from '@/server/user';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   return (
     <DashboardGate>
       <div className='mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-6 md:p-10'>
-        {/* Welcome Banner */}
         <div className='flex flex-col gap-2'>
           <WelcomeTitle />
           <p className='text-muted-foreground'>
-            Here&apos;s what&apos;s happening with your projects today.
+            Manage your client profile, review enquiries, or set up a supplier
+            profile.
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <StatsCards />
-
-        {/* Recent Activity Section */}
-        <RecentActivity />
-
-        {/* Upgrade Banner */}
-        <UpgradeBanner />
+        <div className='grid gap-4 md:grid-cols-3'>
+          <DashboardLink
+            href='/dashboard/client'
+            title='Complete your client profile'
+            description='Add your contact details and preferred way to be reached.'
+          />
+          <DashboardLink
+            href='/dashboard/enquiries'
+            title='Review your enquiries'
+            description='See the status of enquiries linked to your account.'
+          />
+          <DashboardLink
+            href='/dashboard/supplier'
+            title='Supplier profile'
+            description='Create or manage a profile if you provide services.'
+          />
+        </div>
       </div>
     </DashboardGate>
+  );
+}
+
+function DashboardLink({
+  href,
+  title,
+  description
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Card className='p-6'>
+      <Link
+        href={href}
+        className='focus-visible:ring-ring block rounded-sm outline-none focus-visible:ring-2'
+      >
+        <h2 className='font-semibold'>{title}</h2>
+        <p className='text-muted-foreground mt-2 text-sm'>{description}</p>
+        <span className='text-primary mt-4 inline-block text-sm font-medium'>
+          Open
+        </span>
+      </Link>
+    </Card>
   );
 }
 

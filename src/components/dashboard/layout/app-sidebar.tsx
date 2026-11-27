@@ -20,7 +20,9 @@ import {
   Lock,
   Meh,
   Settings,
-  Users
+  UserRound,
+  Users,
+  ClipboardList
 } from 'lucide-react';
 
 const data = {
@@ -34,6 +36,16 @@ const data = {
       title: 'Supplier profile',
       url: '/dashboard/supplier',
       icon: Users
+    },
+    {
+      title: 'My profile',
+      url: '/dashboard/client',
+      icon: UserRound
+    },
+    {
+      title: 'My enquiries',
+      url: '/dashboard/enquiries',
+      icon: ClipboardList
     },
     {
       title: 'Projects',

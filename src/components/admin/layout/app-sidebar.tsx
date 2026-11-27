@@ -43,6 +43,11 @@ const data = {
       icon: Users
     },
     {
+      title: 'Catalog',
+      url: '/admin/catalog',
+      icon: Newspaper
+    },
+    {
       title: 'Follow-ups',
       url: '/admin/follow-ups',
       icon: CalendarClock
